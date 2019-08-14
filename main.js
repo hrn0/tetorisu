@@ -1,5 +1,7 @@
+
+
 //落ちるスピード
-const GAME_SPEED = 300;
+const GAME_SPEED = 350;
 
 //f-size
 const FIELD_COL = 10;
@@ -31,6 +33,7 @@ const TETRO_COLORS = [
   "#B7F9DF",           //5
   "#C8F9B7",           //6
   "#F9F3B7",           //7
+  "#777",           //8
 ];
 
 const TETRO_TYPES = [
@@ -62,7 +65,7 @@ const TETRO_TYPES = [
   ],
   [           //5.o
     [0,0,0,0],
-    [0,1,,0],
+    [0,1,1,0],
     [0,1,1,0],
     [0,0,0,0]
   ],
@@ -77,8 +80,19 @@ const TETRO_TYPES = [
     [0,1,1,0],
     [1,1,0,0],
     [0,0,0,0]
+  ],
+  [           //8
+    [0,0,0,0],
+    [0,1,0,0],
+    [0,0,0,0],
+    [0,0,0,0]
   ]
 ];
+
+//画像
+let blimage;
+blimage = new Image();
+blimage.src = "3.png";
 
 const START_X = FIELD_COL/2 - TETRO_SIZE/2;
 const START_Y = 0;
@@ -103,6 +117,16 @@ let over = false;
 let scores = 0;
 let scoresp = 0;
 
+if (scoresp >= 10) {
+  GAME_SPEED = 300;
+}else if (scoresp >= 30) {
+  GAME_SPEED = 250;
+}else if (scoresp >= 40) {
+  GAME_SPEED = 200;
+}else if (scoresp >= 50) {
+  GAME_SPEED = 100;
+}
+
 tetro_t = Math.floor(Math.random()*(TETRO_TYPES.length-1)+1);
 tetro = TETRO_TYPES[ tetro_t];
 
@@ -114,9 +138,16 @@ function init(){
       }
   }
   //test
-  // field[5][8] = 1;
-  // field[19][0] = 1;
-  // field[19][9] = 1;
+
+  // let tra_x1 = Math.floor(Math.random()*3);
+  // let tra_y1 = Math.floor(Math.random()*12+7);
+  // let tra_x2 = Math.floor(Math.random()*3+3);
+  // let tra_y2 = Math.floor(Math.random()*12+7);
+  // let tra_x3 = Math.floor(Math.random()*3+7);
+  // let tra_y3 = Math.floor(Math.random()*12+7);
+  // field[tra_y1][tra_x1] = 1;
+  // field[tra_y2][tra_x2] = 1;
+  // field[tra_y3][tra_x3] = 1;
 }
 
 init();
@@ -129,10 +160,14 @@ function drawBlock(x,y,c){
   let px = x * BLOCK_SIZE;
   let py = y * BLOCK_SIZE;
 
+  con.drawImage(blimage,
+      (c-1)*BLOCK_SIZE,0, BLOCK_SIZE,BLOCK_SIZE,
+      px,py,          BLOCK_SIZE,BLOCK_SIZE);
+
   con.fillStyle = TETRO_COLORS[c];
-  con.fillRect(px,py, BLOCK_SIZE, BLOCK_SIZE);
   con.strokeStyle = 'black';
-  con.strokeRect(px,py, BLOCK_SIZE, BLOCK_SIZE);
+  // con.fillRect(px,py, BLOCK_SIZE, BLOCK_SIZE);
+  // con.strokeRect(px,py, BLOCK_SIZE, BLOCK_SIZE);
 }
 drawBlock();
 
@@ -147,11 +182,17 @@ for(let y = 0 ; y < FIELD_ROW ; y++){
   }
 }
 }
+
+// let plus = 0;
+// while (checkMove(0,plus+1))plus++;
+
 //テトロミノ表示
 function drawTetro(){
 for(let y = 0 ; y < TETRO_SIZE ; y++){
   for(let x = 0 ; x < TETRO_SIZE ; x++){
     if(tetro[y][x] == 1){
+      // drawBlock(tetro_x+x,tetro_y+y+plus,0);
+
       drawBlock(tetro_x + x,tetro_y + y,tetro_t);
     }
   }
@@ -282,7 +323,7 @@ document.onkeydown = function(e){
       tetro_x++;
       break;
     case 40://d
-    if (checkMove(0,1))
+    if(checkMove(0,1))
       tetro_y++;
       break;
     case 32://s
@@ -290,35 +331,53 @@ document.onkeydown = function(e){
       if (checkMove(0,0,ntetro))
       tetro = rotate();
       break;
+
+    case 97:
+      blimage.src = "2.png";
+      break;
+    case 98:
+      blimage.src = "3.png";
+      break;
+    case 99:
+      blimage.src = "4.png";
+      break;
+    case 100:
+      blimage.src = "5.png";
+      break;
+    case 101:
+      blimage.src = "6.png";
+      break;
   }
   drawField();
   drawTetro();
 }
-const l = document.getElementById('l');
-const k = document.getElementById('k');
-const r = document.getElementById('r');
-const d = document.getElementById('d');
-
-l.addEventListener('click',function(){
-  if (checkMove(-1,0))
-    tetro_y--;
-    drawField();
-    drawTetro();
-})
-k.addEventListener('click',function(){
-  let ntetro = rotate();
-  if (checkMove(0,0,ntetro))
-  tetro = rotate();
-})
-r.addEventListener('click',function(){
-  if (checkMove(1,0))
-    tetro_y--;
-    drawField();
-    drawTetro();
-})
-d.addEventListener('click',function(){
-  if (checkMove(0,1))
-    tetro_y--;
-    drawField();
-    drawTetro();
-})
+// const l = document.getElementById('l');
+// const k = document.getElementById('k');
+// const r = document.getElementById('r');
+// const d = document.getElementById('d');
+//
+// l.addEventListener('click',function(){
+//   if (checkMove(-1,0))
+//     tetro_y--;
+//     drawField();
+//     drawTetro();
+// })
+// k.addEventListener('click',function(){
+//   let ntetro = rotate();
+//   if (checkMove(0,0,ntetro))
+//   tetro = rotate();
+//   drawField();
+//   drawTetro();
+// })
+// r.addEventListener('click',function(){
+//   if (checkMove(1,0))
+//     tetro_y--;
+//     drawField();
+//     drawTetro();
+// })
+// d.addEventListener('click',function(){
+//   if (checkMove(0,1))
+//     tetro_y--;
+//     drawField();
+//     drawTetro();
+// })
